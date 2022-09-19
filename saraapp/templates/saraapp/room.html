@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Chat Room</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script> -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+        <style>
+            body{
+                background: rgb(240, 246, 250);
+                justify-content:center;
+            }
+            .form-rounded{
+                border-radius: 50px;
+            }
+            .sara-intro h2 {
+                text-align:center;
+                overflow: hidden; /* Ensures the content is not revealed until the animation */
+                border-right: .15em solid white; /* The typwriter cursor */
+                white-space: nowrap; /* Keeps the content on a single line */
+                margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+                letter-spacing: .15em; /* Adjust as needed */
+                animation: 
+                    typing 4.5s steps(30, end),
+                    blink-caret .75s step-end infinite;
+                }
+
+
+                /* The typing effect */
+                @keyframes typing {
+                from { width: 0 }
+                to { width: 85% }
+                }
+
+                /* The typewriter cursor effect */
+                @keyframes blink-caret {
+                from, to { border-color: transparent }
+                70% { border-color: rgb(240, 246, 250); }
+                }
+
+                .rounded-pill-left {
+                    border-top-left-radius: 50rem !important;
+                    border-bottom-left-radius: 50rem !important;
+                    }
+                .rounded-pill-right {
+                border-top-right-radius: 50rem !important;
+                border-bottom-right-radius: 50rem !important;
+                }
+                .input-group{
+                    width: 700px;
+                    margin-left: 180px;
+                    
+                }
+
+                #bot_reply{
+                    text-align:center;
+                    margin-top:40px;
+                    margin:auto;
+                    display:none;
+                    border: 1px solid white;
+                    background-color: white;;
+
+                }
+                #bot_hr{
+                    display:none;
+                }
+                @media only screen and (max-width: 600px){
+                    @keyframes typing {
+                        from { width: 0 }
+                        to { width: 90% }
+                        }
+                    .input-group{
+                        width: 350px;
+                        margin-left:0px;
+                    }
+                    .sara-intro h2{
+                        font-size:11px;
+                    }
+                }
+
+                @media only screen and (max-width: 400px){
+                    @keyframes typing {
+                        from { width: 0 }
+                        to { width: 90% }
+                        }
+                    .input-group{
+                        width: 350px;
+                        margin-left: 0px;
+                    }
+                    .sara-intro h2{
+                        font-size:11px;
+                    }
+                }
+                
+        </style>
+    </head>
+    <body>
+        <center><h2>Hi &#x1F44B; &nbsp; <span id = "uname"><p></p></span></h2></center>
+        <div class = "sara-intro"><h2>This is <span><strong>DjSara</strong></span>, an assistant powered by RASA</h2></div>
+    
+        <!-- <textarea id = "chat-log" cols="100" rows="20"></textarea><br> -->
+        <!-- <input id = "form-control chat-message-input" type = "text" size = "100"><br> -->
+        <div class = "container">    
+            <div class="row">
+                <div class="col-md-10 mt-5">
+                  <div class="input-group" id = "">
+                    <input class="form-control border rounded-pill-left border-right-0" type="search" value="Search: Tell me the weather of Chandigarh" id="chat-message-input" size = "500">
+                    <span class="input-group-append">
+                      <button class="btn btn-outline-secondary border rounded-pill-right border-left-0" type="button" id = "chat-message-submit">
+                          <i class="fa fa-search"></i>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+                <br>
+                
+        
+            </div>
+            <hr id = "bot_hr">
+            <div id="bot_reply">
+                <h2 id = "title"></h2>
+                
+                <h4 id = "sky"></h4>
+                <h4 id = "temperature"></h4>
+                <h4 id = "humidity"></h4>
+                <h4 id = "wind_speed"></h4>
+                
+                
+           </div>
+        </div>
+        <!-- <input id = "form-control form-rounded chat-message-submit" type = "button" value = "Send"> -->
+        {{ room_name | json_script:"room-name" }}
+
+        <script>
+            const roomName = JSON.parse(document.getElementById('room-name').textContent);
+            
+
+            const chatSocket = new WebSocket(
+                'ws://' + window.location.host + "/ws/chat/" + roomName + "/"
+        
+            );
+            var user_name = roomName.replaceAll('_',' ')
+            document.getElementById('uname').innerHTML = ""
+            document.getElementById('uname').innerHTML += user_name
+            window.addEventListener('load', (event) => {
+                'speechSynthesis' in window ? console.log("Web Speech API supported!") : console.log("Web Speech API not supported :-(")
+
+const synth = window.speechSynthesis
+let ourText = "Hi " + user_name + " I am your assistant, djsara. You can search weather information of different states of India"
+const utterThis = new SpeechSynthesisUtterance(ourText)
+
+synth.speak(utterThis)
+});
+
+            chatSocket.onmessage = function(e){
+                // document.getElementById('bot_reply').innerHTML = "<h2 class = 'title'></h2>"
+                const data = JSON.parse(e.data);
+                console.log('then here')
+                console.log(data)
+            
+                document.getElementById('bot_reply').style.display="block"; 
+                if (data.bot_reply && data.result === 1){
+                    console.log(JSON.parse(data.bot_reply)['city']);
+                    console.log('bot_reply')
+                    document.getElementById('bot_hr').style.display = "block";
+                    document.getElementById('title').innerHTML = "<u> Weather of " + JSON.parse(data.bot_reply)['city'] + "</u>";
+                    document.getElementById('sky').innerHTML = "<br><b>Sky: </b><span style = 'color:blue; font-size:20px;'>" + JSON.parse(data.bot_reply)['condition'] + "</span>"
+                    document.getElementById('temperature').innerHTML = "<b>Temperature is: </b><span style = 'color:blue; font-size:20px;'>" + JSON.parse(data.bot_reply)['temperature'] + "K</span>"
+                    document.getElementById('humidity').innerHTML = "<b>Humidity is: </b><span style = 'color:blue; font-size:20px;'>" + JSON.parse(data.bot_reply)['humidity'] + " %</span>"
+                    document.getElementById('wind_speed').innerHTML = "<b>Wind Speed is: </b><span style = 'color:blue; font-size:20px;'>" + JSON.parse(data.bot_reply)['wind_speed'] + " mile/hr</span>"
+                }else if(data.bot_reply && data.result === 0){
+                    document.getElementById('bot_hr').style.display = "block";
+                    document.getElementById('title').innerHTML = "<br>" + data.bot_reply
+                }
+                const synth = window.speechSynthesis
+                let result_text = "here is the weather info of " + JSON.parse(data.bot_reply)['city'] 
+                result_text += ". We can see " + JSON.parse(data.bot_reply)['condition'] +" ski"
+                result_text += ". Wind speed is " + JSON.parse(data.bot_reply)['wind_speed'] + " miles per hour"
+                result_text += ", having " + JSON.parse(data.bot_reply)['humidity'] + "% of humidity in the air"
+                const utterThis = new SpeechSynthesisUtterance(result_text)
+
+                synth.speak(utterThis)
+                // document.querySelector("#chat-log").value += (data.message + '\n');
+            };
+
+            chatSocket.onclose = function(e){
+                console.error('Chat Socket closed unexpectedly due to:- ',e);
+            };
+
+            // document.querySelector("#chat-message-input").focus();
+            document.querySelector('#chat-message-input').onkeyup = function(e){
+                if (e.keyCode === 13){
+                    document.querySelector('#chat-message-submit').click();
+                }
+            };
+            document.querySelector('#chat-message-submit').onclick = function(e){
+                const messageInputDom = document.querySelector('#chat-message-input');
+                const message = messageInputDom.value;
+                console.log("here")
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                messageInputDom.value = '';
+            };
+        </script>
+    </body>
+</html>
+
+
+<!-- <html>
+    <head></head>
+    <body>
+        <div id = "chat-log" style = "background-color: whitesmoke;color: #1B2430; width: 100%; height: 500px; margin-left: 1%; padding: 1%; overflow-y:scroll">
+            {% for message in messages %}
+                {% if message.sender_user == user %}
+                    <div style="float:right;">{{ message.sender_user }} : {{ message.message }}</div>
+                {% else %}
+                    <div style = "float:left;">{{ message.sender_user }} : {{ message.message }}</div>
+                {% endif %}
+                <br>
+            {% endfor %}
+        </div>
+        <div style = "margin-left: 1%; padding-top: 1%;">
+        <input id = "chat-message-input" type = "text" size = "60" style = "width: 85%;">&nbsp;
+        <input id = "chat-message-submit" type = "button" value = "Send" style = "width:13%; color:white; background-color: #1B2430;">
+    </div>
+    </body>
+
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    {{ room_name | json_script:"room-name" }}
+
+    <script>
+        var sender = '{{ sender_id }}';
+        var receiver = '{{ receiver_id }}';
+        var sender_name = '{{ sender_name }}';
+        var user = '{{ user }}'
+
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+        );
+        chatSocket.onmessage = function(e){
+            const data = JSON.parse(e.data);
+            if (data.sender_name === user){
+                $("#chat-log").append("<div style='float:right'>" + data.sender_name + " : " + data.message + "</div><br>");
+            }else{
+                $("$chat-log").append("<div style='float:left'>" + data.sender_name + " : " + data.message + "</div><br>");
+
+            }
+            $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+        }
+        chatSocket.onclose = function(e){
+            console.log('Error', e)
+            console.error('Chat socket closed unexpectedly');
+        };
+
+    </script>
+</html> -->
