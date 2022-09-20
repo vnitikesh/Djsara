@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -11,10 +12,19 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 
+
+       
+
+
         <style>
+            #third{
+             background: url('{{ STATIC_URL }}images/uskd4x557wno7irs1q71.webp')
+     }
             body{
                 background: rgb(240, 246, 250);
                 justify-content:center;
+                /* background: url("static/images/uskd4x557wno7irs1q71.webp") */
+                /* background: url('{{ STATIC_URL }}images/uskd4x557wno7irs1q71.webp') */
             }
             .form-rounded{
                 border-radius: 50px;
@@ -70,6 +80,39 @@
                 #bot_hr{
                     display:none;
                 }
+
+                .result-qr-code{
+                    display: None;
+                }
+
+                .result-qr-code{
+                    gap: 15px;
+                    font-size: 18px;
+                    font-weight: 600;
+                }
+                .qr-img{
+                   text-align:center;
+                    
+                    display: none;
+                    /* margin: 0 auto; */
+                    margin-left: 50px;
+                }
+
+                .qr-img .svg{
+                    width: 100%;
+                }
+
+                #background-image{
+                    /* background: url("/images/uskd4x557wno7irs1q71.webp"); */
+                    background: url('{% static "images/uskd4x557wno7irs1q71.webp" %}') 50% 0 no-repeat fixed;
+                    height: 650px;
+                }
+
+
+
+                
+
+
                 @media only screen and (max-width: 600px){
                     @keyframes typing {
                         from { width: 0 }
@@ -82,6 +125,16 @@
                     .sara-intro h2{
                         font-size:11px;
                     }
+                    .qr-img{
+                   
+                    
+                    display: none;
+                    margin: 0 auto;
+                }
+
+                .qr-img .svg{
+                    width: 100%;
+                }
                 }
 
                 @media only screen and (max-width: 400px){
@@ -96,17 +149,33 @@
                     .sara-intro h2{
                         font-size:11px;
                     }
+                    .qr-img{
+                   text-align:center;
+                    
+                    display: none;
+                    margin: 0 auto;
+                }
+
+                .qr-img .svg{
+                    width: 100%;
+                }
                 }
                 
         </style>
     </head>
     <body>
+        <!-- <img src = "{% static 'images/uskd4x557wno7irs1q71.webp' %}" alt = 'no-image' /> -->
+        <!-- <div id = 'background-image'></div> -->
         <center><h2>Hi &#x1F44B; &nbsp; <span id = "uname"><p></p></span></h2></center>
         <div class = "sara-intro"><h2>This is <span><strong>DjSara</strong></span>, an assistant powered by RASA</h2></div>
     
         <!-- <textarea id = "chat-log" cols="100" rows="20"></textarea><br> -->
         <!-- <input id = "form-control chat-message-input" type = "text" size = "100"><br> -->
-        <div class = "container">    
+        <div class = "container">  
+            <!-- <div class = "qr-img" style = "margin: auto; text-align:center;">
+                <p class = "svg">{{ svg | safe }}</p>
+            </div>
+   -->
             <div class="row">
                 <div class="col-md-10 mt-5">
                   <div class="input-group" id = "">
@@ -116,11 +185,23 @@
                           <i class="fa fa-search"></i>
                       </button>
                     </span>
+                    
                   </div>
                 </div>
+                
                 <br>
                 
         
+            </div>
+            <br>
+            <div class = "row">
+                <div class = "col-md-12 mt-2 text-center">
+                    <button type = "button" class = "btn btn-primary" id = "qrcode-switcher" onclick = "qrcode_switcher()">Generate QRcode</button>
+                </div>
+                <div class = "qr-img mt-1" id = "qr-img" style = "margin: auto; text-align:center;">
+                    <p class = "svg">{{ svg | safe }}</p>
+                </div>
+      
             </div>
             <hr id = "bot_hr">
             <div id="bot_reply">
@@ -133,30 +214,100 @@
                 
                 
            </div>
+
+           
+           <!-- <div class = "result-qr-code">
+                <canvas id = "canvas"></canvas>
+           </div> -->
+
+        </div>
+
+        <div class="words" contenteditable>
+            <p id="p"></p>
         </div>
         <!-- <input id = "form-control form-rounded chat-message-submit" type = "button" value = "Send"> -->
         {{ room_name | json_script:"room-name" }}
 
         <script>
+
+
+
+        // var speech = true;
+        // window.SpeechRecognition = window.SpeechRecognition
+        //                 || window.webkitSpeechRecognition;
+        // console.log("I am here")
+        // const recognition = new SpeechRecognition();
+        // recognition.interimResults = true;
+        // const words = document.querySelector('.words');
+        // words.appendChild(p);
+        // console.log("here..")
+  
+        // recognition.addEventListener('result', e => {
+        //     const transcript = Array.from(e.results)
+        //         .map(result => result[0])
+        //         .map(result => result.transcript)
+        //         .join('')
+  
+        //     document.getElementById("p").value = transcript;
+        //     console.log(transcript);
+        // });
+          
+        // if (speech == true) {
+        //     recognition.start();
+        //     recognition.addEventListener('end', recognition.start);
+        // }
+
+
+            function qrcode_switcher(){
+                
+                var qr_img_mode = document.getElementById('qr-img').style.display;
+                document.getElementById('qrcode-switcher').innerHTML = ""
+                if (qr_img_mode === 'block'){
+                    document.getElementById('qr-img').style.display = 'None';
+                    document.getElementById('qrcode-switcher').innerHTML += "Generate QRCode";
+                }else{
+                    document.getElementById('qr-img').style.display = 'block';
+                    document.getElementById('qrcode-switcher').innerHTML += "Close QRCode";
+                }
+                console.log(document.getElementById('qrcode-switcher').innerHTML);
+                 
+                // document.getElementById('qrcode-switcher').innerHTML += "Close QRcode";
+            }
+
             const roomName = JSON.parse(document.getElementById('room-name').textContent);
             
 
-            const chatSocket = new WebSocket(
+            let chatSocket = new WebSocket(
                 'ws://' + window.location.host + "/ws/chat/" + roomName + "/"
         
             );
+            // Generating qr code
+
+            // import QRCode from 'qrcode';
+            // var resultQrcode = document.getElementById("result-qr-code")
+            // var canvas = document.getElementById("canvas");
+            
+            // QRCode.toCanvas(canvas, window.location.href, function(error){
+            //     if(error){
+            //         console.log("QR code generated...");
+            //     }
+            // });
+            // resultQrcode.style.display = "flex";
+
+
+
             var user_name = roomName.replaceAll('_',' ')
             document.getElementById('uname').innerHTML = ""
             document.getElementById('uname').innerHTML += user_name
             window.addEventListener('load', (event) => {
                 'speechSynthesis' in window ? console.log("Web Speech API supported!") : console.log("Web Speech API not supported :-(")
 
-const synth = window.speechSynthesis
-let ourText = "Hi " + user_name + " I am your assistant, djsara. You can search weather information of different states of India"
-const utterThis = new SpeechSynthesisUtterance(ourText)
+            const synth = window.speechSynthesis
+            let ourText = "Hi " + user_name + " I am your assistant, djsara. You can search weather information of different states of India"
+            const utterThis = new SpeechSynthesisUtterance(ourText)
 
-synth.speak(utterThis)
-});
+            synth.speak(utterThis)
+            });
 
             chatSocket.onmessage = function(e){
                 // document.getElementById('bot_reply').innerHTML = "<h2 class = 'title'></h2>"
@@ -208,6 +359,53 @@ synth.speak(utterThis)
                 }));
                 messageInputDom.value = '';
             };
+
+
+            // Voice capture
+
+            var speech = true;
+        window.SpeechRecognition = window.SpeechRecognition
+                        || window.webkitSpeechRecognition;
+  
+        const recognition = new SpeechRecognition();
+        recognition.interimResults = true;
+        const words = document.querySelector('.words');
+        words.appendChild(p);
+  
+        recognition.addEventListener('result', e => {
+            let transcript = Array.from(e.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('')
+  
+            document.getElementById("chat-message-input").value = transcript;
+            console.log(transcript);
+            // chatSocket.send(JSON.stringify({
+            //             'message': transcript,
+            //         })
+            // );
+
+        })
+        
+        
+            // chatSocket.send(JSON.stringify({
+            //             'message': transcript,
+            //         })
+            // );
+    
+          
+        if (speech == true) {
+            recognition.start();
+            recognition.addEventListener('end', recognition.start);
+            console.log("I am here now")
+        //     chatSocket.send(JSON.stringify({
+        //             'message': transcript,
+        //         })
+        // );
+    }
+
+
+
         </script>
     </body>
 </html>

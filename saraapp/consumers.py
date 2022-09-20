@@ -50,12 +50,12 @@ class ChatConsumer(WebsocketConsumer):
         print("payload:- ",payload)
         headers = {"content-type": "application/json"}
         r = json.loads(requests.post('http://localhost:5005/webhooks/rest/webhook', json = payload, headers = headers).text)
-        print(r)
+        print("request content:- ",r)
         bot_reply = ''
         
         
         try:
-            bot_reply = r[1]['text']
+            bot_reply = json.loads(r[1]['text'])
             print(bot_reply)
             result = 1
         except:
